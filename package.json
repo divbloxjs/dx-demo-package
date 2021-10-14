@@ -4,7 +4,7 @@
   "description": "A demo package to show how remote packages should be constructed",
   "main": "index.js",
   "scripts": {
-    "postinstall": "npx github:divbloxjs/divbloxjs-package-generator",
+    "postinstall": "echo \"Package installed. You can now run npx github:divbloxjs/dx-register-package\" && exit 0",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
