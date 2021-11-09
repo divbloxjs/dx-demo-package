@@ -1,34 +1,35 @@
 const dx = require('../../dx-app');
-const dxDemoPackageController = require('./index');
+const exampleSafeToDeleteController = require('./index');
 const divbloxEndpointBase = require('divbloxjs/dx-core-modules/endpoint-base');
 
-class DxDemoPackageEndpoint extends divbloxEndpointBase {
+class ExampleSafeToDelete extends divbloxEndpointBase {
     constructor() {
         super();
+        this.endpointName = "my-example";
+        this.endpointDescription = "An example endpoint to demonstrate divblox api's";
 
-        this.endpointName = "dxDemoPackage"; // Change this to set the actual url endpoint
-        this.endpointDescription = "dxDemoPackage endpoint"; // Change this to be more descriptive of the endpoint
-
-        // TODO: Declare any additional operations here
-        const getPackageName = this.getOperationDefinition(
+        // We add a custom operation declaration here
+        const testOperation = this.getOperationDefinition(
             {
-                "operationName": "getPackageName",
-                "allowedAccess": ["anonymous"], // If this array does not contain "anonymous", a JWT token will be expected in the Auth header
+                "operationName": "test",
+                "allowedAccess": ["anonymous"],
                 "operationDescription": "This sentence describes the operation",
-                "parameters": [], // An array of this.getInputParameter()
-                "requestType": "GET", // GET|POST|PUT|DELETE|OPTIONS|HEAD|PATCH|TRACE
-                "requestSchema": {}, // this.getSchema()
-                "responseSchema": {}, // this.getSchema()
+                "parameters": [
+                    this.getInputParameter({"name":"test","type":"header"}),
+                    this.getInputParameter({"name":"test2","type":"path"})
+                ],
+                "requestType": "POST",
+                "requestSchema": this.getSchema({"testAttr":"string","testAttr2":"boolean"}),
+                "responseSchema": this.getSchema({"respAttr":"string","respAttr2":"boolean"})
             }
         );
 
-        // You need to do this in order for the operation to be available on the endpoint.
-        // Also, this declaration provides the necessary input for swagger ui present the docs for this
-        this.declareOperations([getPackageName]);
+        // An example of how to declare operations. You need to do this in order for the operation to be available on
+        // the endpoint. Also, this declaration provides the necessary input for swagger ui present the docs for this
+        this.declareOperations([testOperation]);
 
-        // TODO: Declare any entity schemas here if needed
         // An example of how to declare entity schemas for swagger ui
-        //this.declareEntitySchemas(["anEntityInYourDataModel"]);
+        this.declareEntitySchemas(["globalIdentifier"]);
     }
 
     async executeOperation(operation, request, dxInstance = null) {
@@ -38,20 +39,21 @@ class DxDemoPackageEndpoint extends divbloxEndpointBase {
 
         // Here we have to deal with our custom operations
         switch(operation) {
-            case 'getPackageName': await this.getPackageName();
+            case 'test': await this.test();
                 break;
-            // TODO: Add additional cases here for each declared operation
         }
 
         return true;
     }
 
-    async getPackageName() {
-        this.setResult(true, "Package name is dxDemoPackage");
+    /**
+     * Our custom operation's implementation
+     * @return {Promise<void>}
+     */
+    async test() {
+        await exampleSafeToDeleteController.doExampleCreate();
+        this.setResult(true, "You called the test operation");
     }
-
-    // TODO: Add implementations for each declared operation below
 }
-const dxDemoPackageEndpointInstance = new DxDemoPackageEndpoint();
-
-module.exports = dxDemoPackageEndpointInstance;
+const exampleSafeToDeleteInstance = new ExampleSafeToDelete();
+module.exports = exampleSafeToDeleteInstance;
