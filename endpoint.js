@@ -55,6 +55,7 @@ class DivbloxDemoPackage extends divbloxEndpointBase {
     async getEntityOne(id = -1) {
         const entityData = await this.controller.getEntityOne(id);
         this.setResult(true, "You called the test operation");
+        this.addResultDetail(entityData);
     }
 }
 module.exports = DivbloxDemoPackage;
