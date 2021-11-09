@@ -13,16 +13,16 @@ class DivbloxDemoPackage extends divbloxEndpointBase {
         // We add a custom operation declaration here
         const testOperation = this.getOperationDefinition(
             {
-                "operationName": "test",
+                "operationName": "getEntityOne",
                 "allowedAccess": ["anonymous"],
-                "operationDescription": "This sentence describes the operation",
+                "operationDescription": "Returns the instance of ExampleEntityOne that matches the provided id",
                 "parameters": [
                     this.getInputParameter({"name":"test","type":"header"}),
-                    this.getInputParameter({"name":"test2","type":"path"})
+                    this.getInputParameter({"name":"id","type":"path"})
                 ],
-                "requestType": "POST",
-                "requestSchema": this.getSchema({"testAttr":"string","testAttr2":"boolean"}),
-                "responseSchema": this.getSchema({"respAttr":"string","respAttr2":"boolean"})
+                "requestType": "GET",
+                "requestSchema": {},
+                "responseSchema": this.dxInstance.getEntitySchema("ExampleEntityOne")
             }
         );
 

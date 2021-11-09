@@ -1,9 +1,14 @@
 const divbloxPackageControllerBase = require('divbloxjs/dx-core-modules/package-controller-base');
 const ExampleEntityOne = require('divbloxjs/dx-orm/generated/example-entity-one');
+const ExampleEntityTwo = require('divbloxjs/dx-orm/generated/example-entity-two');
 
 class DivbloxDemoPackage extends divbloxPackageControllerBase {
     constructor(dxInstance = null) {
         super(dxInstance);
+
+        if ((typeof this.dxInstance === "undefined") || (this.dxInstance === null)) {
+            throw new Error("Divblox instance was not provided");
+        }
     }
 
     /**
@@ -11,9 +16,6 @@ class DivbloxDemoPackage extends divbloxPackageControllerBase {
      * @return {Promise<void>}
      */
     doExampleCrud = async () => {
-        if ((typeof this.dxInstance === "undefined") || (this.dxInstance === null)) {
-            throw new Error("Divblox instance was not provided");
-        }
         // Let's create a new row for the object of type "exampleEntityOne" in the database with some parameters
         const objId = await this.dxInstance.create("exampleEntityOne", {"exampleOneTimeStamp":"2021-01-01 12:00:00","exampleOneStringWithoutNull":"Example String","exampleOneBigInt":123,"exampleOneText":"Example text"});
         if (objId === -1) {
@@ -50,7 +52,7 @@ class DivbloxDemoPackage extends divbloxPackageControllerBase {
      * An example of how to use the default divbloxjs object models that are generated at startup
      * @return {Promise<void>}
      */
-    doExampleCreate = async () => {
+    createEntityOne = async () => {
         const exampleEntityOne = new ExampleEntityOne(this.dxInstance);
 
         // If we just start adding data, we will be creating a new entry in the database
@@ -86,6 +88,20 @@ class DivbloxDemoPackage extends divbloxPackageControllerBase {
             console.log("Error loading object with id "+id+" from database");
             console.dir(exampleEntityOne.getError());
         }
+    }
+
+    getEntityOne = async (id = -1) => {
+        const exampleEntityOne = new ExampleEntityOne(this.dxInstance);
+
+        if (await exampleEntityOne.load(id)) {
+            console.log("Loaded object with id "+id+" from the database");
+            console.dir(exampleEntityOne.data);
+        } else {
+            console.log("Error loading object with id "+id+" from database");
+            console.dir(exampleEntityOne.getError());
+        }
+
+        return exampleEntityOne.data;
     }
 }
 
