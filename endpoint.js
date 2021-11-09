@@ -14,7 +14,7 @@ class ExampleSafeToDelete extends divbloxEndpointBase {
         const testOperation = this.getOperationDefinition(
             {
                 "operationName": "test",
-                "allowedAccess": ["user"],
+                "allowedAccess": ["anonymous"],
                 "operationDescription": "This sentence describes the operation",
                 "parameters": [
                     this.getInputParameter({"name":"test","type":"header"}),
