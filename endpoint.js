@@ -1,13 +1,13 @@
-const exampleSafeToDeleteController = require('./index');
+const DivbloxDemoPackageController = require('./index');
 const divbloxEndpointBase = require('divbloxjs/dx-core-modules/endpoint-base');
 
-class ExampleSafeToDelete extends divbloxEndpointBase {
+class DivbloxDemoPackage extends divbloxEndpointBase {
     constructor(dxInstance = null) {
         super(dxInstance);
 
-        this.controller = new exampleSafeToDeleteController(this.dxInstance);
+        this.controller = new DivbloxDemoPackageController(this.dxInstance);
 
-        this.endpointName = "my-example";
+        this.endpointName = "dx-demo";
         this.endpointDescription = "An example endpoint to demonstrate divblox api's";
 
         // We add a custom operation declaration here
@@ -31,7 +31,7 @@ class ExampleSafeToDelete extends divbloxEndpointBase {
         this.declareOperations([testOperation]);
 
         // An example of how to declare entity schemas for swagger ui
-        this.declareEntitySchemas(["globalIdentifier"]);
+        this.declareEntitySchemas(["exampleEntityOne","exampleEntityTwo"]);
     }
 
     async executeOperation(operation, request) {
@@ -57,4 +57,4 @@ class ExampleSafeToDelete extends divbloxEndpointBase {
         this.setResult(true, "You called the test operation");
     }
 }
-module.exports = ExampleSafeToDelete;
+module.exports = DivbloxDemoPackage;
