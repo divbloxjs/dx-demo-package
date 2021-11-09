@@ -41,7 +41,7 @@ class DivbloxDemoPackage extends divbloxEndpointBase {
 
         // Here we have to deal with our custom operations
         switch(operation) {
-            case 'test': await this.test();
+            case 'getEntityOne': await this.getEntityOne(request.path);
                 break;
         }
 
@@ -52,8 +52,8 @@ class DivbloxDemoPackage extends divbloxEndpointBase {
      * Our custom operation's implementation
      * @return {Promise<void>}
      */
-    async test() {
-        await this.controller.doExampleCreate();
+    async getEntityOne(id = -1) {
+        const entityData = await this.controller.getEntityOne(id);
         this.setResult(true, "You called the test operation");
     }
 }
