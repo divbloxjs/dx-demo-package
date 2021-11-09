@@ -22,7 +22,7 @@ class DivbloxDemoPackage extends divbloxEndpointBase {
                 ],
                 "requestType": "GET",
                 "requestSchema": {},
-                "responseSchema": this.dxInstance.getEntitySchema("ExampleEntityOne")
+                "responseSchema": this.dxInstance.getEntitySchema("exampleEntityOne")
             }
         );
 
