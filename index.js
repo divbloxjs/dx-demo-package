@@ -1,108 +1,91 @@
 const divbloxPackageControllerBase = require('divbloxjs/dx-core-modules/package-controller-base');
 const ExampleEntityOne = require('divbloxjs/dx-orm/generated/example-entity-one');
 const ExampleEntityTwo = require('divbloxjs/dx-orm/generated/example-entity-two');
+const exampleEntityOneSchema = require('divbloxjs/dx-orm/generated/schemas/example-entity-one-schema');
 
-class DivbloxDemoPackage extends divbloxPackageControllerBase {
+class DxDemoPackage extends divbloxPackageControllerBase {
     constructor(dxInstance = null) {
         super(dxInstance);
-
-        if ((typeof this.dxInstance === "undefined") || (this.dxInstance === null)) {
-            throw new Error("Divblox instance was not provided");
+        // TODO: Override as required
+    }
+    // TODO: Add package specific functionality below
+    getExample = async(id = -1) => {
+        const exampleEntityOne = new ExampleEntityOne(this.dxInstance);
+        if (!await exampleEntityOne.load(id)) {
+            this.populateError("Invalid id provided", true, true);
         }
+        return exampleEntityOne.data;
     }
 
-    /**
-     * This function wraps some example functions to see how we can use Divblox in a specific script
-     * @return {Promise<void>}
-     */
-    doExampleCrud = async () => {
-        // Let's create a new row for the object of type "exampleEntityOne" in the database with some parameters
-        const objId = await this.dxInstance.create("exampleEntityOne", {"exampleOneTimeStamp":"2021-01-01 12:00:00","exampleOneStringWithoutNull":"Example String","exampleOneBigInt":123,"exampleOneText":"Example text"});
-        if (objId === -1) {
-            console.log("Failed to create new exampleEntityOne: "+JSON.stringify(this.dxInstance.getError(), null, 2));
-        } else {
-            // Divblox will always return the database table id for the newly created entry
-            console.log("New exampleEntityOne created!");
-
-            // Let's read the entry from the database. This basically performs a "SELECT from `exampleEntityOne` WHERE `id` = objId"
-            const obj = await this.dxInstance.read("exampleEntityOne", objId);
-            if (obj !== null) {
-                console.log("Found: "+JSON.stringify(obj, null, 2));
-            } else {
-                console.log("Not found: "+JSON.stringify(this.dxInstance.getError(), null, 2));
-            }
-
-            // Let's try and change something on this object using the "update" function
-            if (!await this.dxInstance.update("exampleEntityOne", {"id":objId, "exampleOneStringWithNull":"An updated string", "exampleOneBigInt":999})) {
-                console.log("Error updating: "+JSON.stringify(this.dxInstance.getError(), null, 2));
-            } else {
-                console.log("Updated!");
-            }
-
-            //Let's try deleting an account using the "delete" function and specifying the exampleEntityOne's id
-            if (!await this.dxInstance.delete("exampleEntityOne", 2)) {
-                console.log("Error deleting: "+JSON.stringify(this.dxInstance.getError(), null, 2));
-            } else {
-                console.log("Deleted!");
-            }
-        }
-    }
-
-    /**
-     * An example of how to use the default divbloxjs object models that are generated at startup
-     * @return {Promise<void>}
-     */
-    createEntityOne = async () => {
+    createExample = async (entityData = {}) => {
         const exampleEntityOne = new ExampleEntityOne(this.dxInstance);
 
         // If we just start adding data, we will be creating a new entry in the database
-        exampleEntityOne.data.exampleOneBigInt = Math.round(100000*Math.random());
-        exampleEntityOne.data.exampleOneStringWithoutNull = Date.now().toString() + Math.random().toString();
+        for (const key of Object.keys(entityData)) {
+            if (typeof exampleEntityOne.data[key] !== "undefined") {
+                exampleEntityOne.data[key] = entityData[key];
+            }
+        }
 
         const saveResult = await exampleEntityOne.save();
         if (!saveResult) {
-            console.dir(exampleEntityOne.getError());
-        } else {
-            console.log("Saved a new instance");
-            console.dir(exampleEntityOne.data);
+            this.populateError(exampleEntityOne.getError(), true, true);
+            this.populateError("Error creating exampleEntityOne:", true);
+            return -1;
         }
 
-        // Once we've saved once, any changes when saving will result in an update in the database
-        exampleEntityOne.data.exampleOneStringWithNull = "Test String Updated";
-
-        const saveResult2 = await exampleEntityOne.save();
-        if (!saveResult2) {
-            console.log("Error saving...");
-            console.dir(exampleEntityOne.getError());
-        } else {
-            console.log("Saved an update");
-            console.dir(exampleEntityOne.data);
-        }
-
-        // We can also load an object from the database by its id
-        const id = exampleEntityOne.data.id;
-        if (await exampleEntityOne.load(id)) {
-            console.log("Loaded object with id "+id+" from the database");
-            console.dir(exampleEntityOne.data);
-        } else {
-            console.log("Error loading object with id "+id+" from database");
-            console.dir(exampleEntityOne.getError());
-        }
+        return exampleEntityOne.data.id;
     }
 
-    getEntityOne = async (id = -1) => {
+    updateExample = async (entityData = {}) => {
         const exampleEntityOne = new ExampleEntityOne(this.dxInstance);
 
-        if (await exampleEntityOne.load(id)) {
-            console.log("Loaded object with id "+id+" from the database");
-            console.dir(exampleEntityOne.data);
-        } else {
-            console.log("Error loading object with id "+id+" from database");
-            console.dir(exampleEntityOne.getError());
+        if (typeof entityData["id"] === "undefined") {
+            this.populateError("No id provided");
+            return false;
         }
 
-        return exampleEntityOne.data;
+        if (!await exampleEntityOne.load(entityData["id"])) {
+            this.populateError("Invalid id provided");
+            this.populateError(exampleEntityOne.getError());
+            return false;
+        }
+
+        // If we just start adding data, we will be creating a new entry in the database
+        for (const key of Object.keys(entityData)) {
+            if (key === "id") {continue;}
+
+            if (typeof exampleEntityOne.data[key] !== "undefined") {
+                exampleEntityOne.data[key] = entityData[key];
+            }
+        }
+
+        const saveResult = await exampleEntityOne.save();
+        if (!saveResult) {
+            console.log(JSON.stringify(exampleEntityOne.getError(),null,2));
+            this.populateError(exampleEntityOne.getError(), true, true);
+            this.populateError("Error saving exampleEntityOne:", true);
+            return false;
+        }
+
+        return true;
+    }
+
+    deleteExample = async (id = -1) => {
+        const exampleEntityOne = new ExampleEntityOne(this.dxInstance);
+
+        if (!await exampleEntityOne.load(id)) {
+            this.populateError("Invalid id provided",true,true);
+            return false;
+        }
+
+        if (!await exampleEntityOne.delete()) {
+            this.populateError(exampleEntityOne.getError(), true, true);
+            return false;
+        }
+
+        return true;
     }
 }
 
-module.exports = DivbloxDemoPackage;
+module.exports = DxDemoPackage;
