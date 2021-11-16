@@ -81,7 +81,7 @@ class DxDemoPackageEndpoint extends divbloxEndpointBase {
         if (!await super.executeOperation(operation, request)) {
             return false;
         }
-        console.dir(request);
+        
         // Here we have to deal with our custom operations
         if (operation === 'entityOne') {
             const operationDefinition = this.getDeclaredOperation(operation);
